@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Platform Modern - AI-Powered 3-Pillar Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.css" rel="stylesheet">
+    <style>
+        .feature-card { border-left: 4px solid #007bff; }
+        .sentiment-card { border-left: 4px solid #28a745; }
+        .fundamental-card { border-left: 4px solid #ffc107; }
+        .technical-card { border-left: 4px solid #dc3545; }
+        .navbar-brand { font-weight: bold; }
+        .metric-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .sentiment-gauge { height: 200px; }
+        .chart-container { height: 300px; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                🚀 Trading Platform Modern
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#fundamental">Fundamental</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sentiment">Sentiment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#screener">Screener</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#backtest">Backtest</a>
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    AI-Powered 3-Pillar Analysis Platform
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Main Dashboard -->
+        <div id="dashboard">
+            <!-- Platform Overview -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h3 class="mb-0">📊 Trading Platform Modern</h3>
+                        </div>
+                        <div class="card-body">
+                            <h5>AI-Powered Trading Platform dengan Analisis 3-Pilar</h5>
+                            <p class="text-muted">Platform trading profesional yang menggabungkan Technical + Fundamental + Sentiment Analysis</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <h6>🎯 Core Features:</h6>
+                                    <ul>
+                                        <li>Fundamental Analysis (30+ ratios)</li>
+                                        <li>Sentiment Analysis (News + Social)</li>
+                                        <li>Technical Analysis (50+ indicators)</li>
+                                        <li>AI/ML Models (LSTM, FinBERT)</li>
+                                        <li>Backtesting Framework</li>
+                                        <li>Risk Management</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>🔗 API Status:</h6>
+                                    <ul>
+                                        <li><span id="api-status" class="badge bg-success">API Online</span></li>
+                                        <li><span id="db-status" class="badge bg-success">Database Connected</span></li>
+                                        <li><span id="redis-status" class="badge bg-success">Redis Connected</span></li>
+                                        <li><span id="ml-status" class="badge bg-warning">ML Models Loading</span></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>📈 Quick Actions:</h6>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="testFundamentalAPI()">Test Fundamental API</button>
+                                        <button class="btn btn-outline-success btn-sm" onclick="testSentimentAPI()">Test Sentiment API</button>
+                                        <button class="btn btn-outline-info btn-sm" onclick="openScreener()">Open Stock Screener</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card fundamental-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">💼 Fundamental Analysis</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Financial Ratios & Valuation:</h6>
+                            <ul>
+                                <li><strong>Profitability:</strong> ROE, ROA, Profit Margin</li>
+                                <li><strong>Liquidity:</strong> Current Ratio, Cash Ratio</li>
+                                <li><strong>Leverage:</strong> Debt/Equity, Interest Coverage</li>
+                                <li><strong>Valuation:</strong> DCF, Graham Number, PE/PB</li>
+                                <li><strong>Growth:</strong> EPS Growth, Revenue Growth</li>
+                            </ul>
+                            <div class="mt-3">
+                                <button class="btn btn-warning btn-sm" onclick="analyzeFundamental('BBCA')">Analyze BBCA</button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="openFundamentalScreener()">Stock Screener</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card sentiment-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">📰 Sentiment Analysis</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Multi-Source Sentiment:</h6>
+                            <ul>
+                                <li><strong>News Sentiment:</strong> FinBERT, Polarity Analysis</li>
+                                <li><strong>Social Media:</strong> Twitter, Reddit, Facebook</li>
+                                <li><strong>Market Indicators:</strong> Fear & Greed Index, VIX</li>
+                                <li><strong>Insider Activity:</strong> Buy/Sell Patterns</li>
+                                <li><strong>Composite Score:</strong> Weighted Sentiment</li>
+                            </ul>
+                            <div class="mt-3">
+                                <button class="btn btn-success btn-sm" onclick="analyzeSentiment('BBCA')">Analyze BBCA</button>
+                                <button class="btn btn-outline-success btn-sm" onclick="openSentimentDashboard()">Sentiment Dashboard</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Analysis Card -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card technical-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">📈 Technical Analysis</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>50+ Technical Indicators:</h6>
+                            <ul>
+                                <li><strong>Trend:</strong> MA, EMA, MACD, ADX</li>
+                                <li><strong>Momentum:</strong> RSI, Stochastic, Williams %R</li>
+                                <li><strong>Volatility:</strong> Bollinger Bands, ATR, Keltner</li>
+                                <li><strong>Volume:</strong> OBV, MFI, Volume Rate</li>
+                                <li><strong>Patterns:</strong> Candlestick, Chart Patterns</li>
+                            </ul>
+                            <div class="mt-3">
+                                <button class="btn btn-danger btn-sm" onclick="analyzeTechnical('BBCA')">Analyze BBCA</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="openTechnicalDashboard()">Technical Dashboard</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card metric-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">🤖 AI/ML Models</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Machine Learning Pipeline:</h6>
+                            <ul>
+                                <li><strong>LSTM:</strong> Price prediction models</li>
+                                <li><strong>FinBERT:</strong> Financial sentiment</li>
+                                <li><strong>Ensemble:</strong> Model stacking</li>
+                                <li><strong>Feature Engineering:</strong> 50+ indicators</li>
+                                <li><strong>Walk-Forward:</strong> Validation framework</li>
+                            </ul>
+                            <div class="mt-3">
+                                <button class="btn btn-light btn-sm" onclick="trainModels()">Train Models</button>
+                                <button class="btn btn-outline-light btn-sm" onclick="viewModelPerformance()">Model Performance</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Overview -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">📊 Market Overview</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h6 class="text-muted">Fear & Greed Index</h6>
+                                        <div id="fear-greed-gauge" class="sentiment-gauge"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h6 class="text-muted">Market Sentiment</h6>
+                                        <h4 id="market-sentiment" class="text-success">Bullish</h4>
+                                        <small class="text-muted">Composite Score: +0.65</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h6 class="text-muted">Top Gainer</h6>
+                                        <h5 id="top-gainer" class="text-success">BBCA +2.5%</h5>
+                                        <small class="text-muted">Bank Central Asia</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h6 class="text-muted">Top Loser</h6>
+                                        <h5 id="top-loser" class="text-danger">TLKM -1.8%</h5>
+                                        <small class="text-muted">Telkom Indonesia</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Examples -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">🔧 API Examples & Testing</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Fundamental Analysis:</h6>
+                                    <pre><code># Get financial ratios
+GET /api/v1/fundamental/ratios/BBCA
+
+# DCF valuation
+GET /api/v1/fundamental/dcf/BBCA?current_price=8500
+
+# Fundamental screener
+GET /api/v1/fundamental/screener?min_roe=15&max_pe=20</code></pre>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Sentiment Analysis:</h6>
+                                    <pre><code># Composite sentiment
+GET /api/v1/sentiment/composite/BBCA
+
+# News sentiment
+GET /api/v1/sentiment/news/BBCA?days=7
+
+# Market sentiment
+GET /api/v1/sentiment/market</code></pre>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6>Quick Test Buttons:</h6>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-outline-primary" onclick="testAPI('/api/v1/fundamental/ratios/BBCA')">Test Fundamental</button>
+                                    <button class="btn btn-outline-success" onclick="testAPI('/api/v1/sentiment/composite/BBCA')">Test Sentiment</button>
+                                    <button class="btn btn-outline-info" onclick="testAPI('/health')">Health Check</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        
+        // Initialize page
+        $(document).ready(function() {
+            checkAPIStatus();
+            initializeFearGreedGauge();
+            loadMarketOverview();
+        });
+
+        function checkAPIStatus() {
+            // Test API connectivity
+            $.ajax({
+                url: 'http://localhost:8000/health',
+                method: 'GET',
+                success: function(data) {
+                    $('#api-status').removeClass('bg-danger').addClass('bg-success').text('API Online');
+                    $('#db-status').removeClass('bg-danger').addClass('bg-success').text('Database Connected');
+                    $('#redis-status').removeClass('bg-danger').addClass('bg-success').text('Redis Connected');
+                },
+                error: function() {
+                    $('#api-status').removeClass('bg-success').addClass('bg-danger').text('API Offline');
+                    $('#db-status').removeClass('bg-success').addClass('bg-danger').text('Database Error');
+                    $('#redis-status').removeClass('bg-success').addClass('bg-danger').text('Redis Error');
+                }
+            });
+        }
+
+        function initializeFearGreedGauge() {
+            // Fear & Greed Gauge Chart
+            var options = {
+                series: [65],
+                chart: {
+                    height: 200,
+                    type: 'radialBar',
+                },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -90,
+                        endAngle: 90,
+                        dataLabels: {
+                            name: {
+                                fontSize: '16px',
+                                color: undefined,
+                                offsetY: -10
+                            },
+                            value: {
+                                offsetY: 16,
+                                fontSize: '22px',
+                                color: undefined,
+                                formatter: function (val) {
+                                    return val + '%'
+                                }
+                            }
+                        }
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'horizontal',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#28a745'],
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 100]
+                    }
+                },
+                labels: ['Fear & Greed Index'],
+                colors: ['#dc3545']
+            };
+
+            var chart = new ApexCharts(document.querySelector("#fear-greed-gauge"), options);
+            chart.render();
+        }
+
+        function loadMarketOverview() {
+            // Load market sentiment
+            $.ajax({
+                url: API_BASE + '/sentiment/market',
+                method: 'GET',
+                success: function(data) {
+                    if (data.fear_greed_index) {
+                        // Update gauge
+                        $('#fear-greed-gauge').html('<div class="text-center"><h3>' + data.fear_greed_index + '</h3><small>Fear & Greed Index</small></div>');
+                    }
+                    if (data.market_sentiment) {
+                        $('#market-sentiment').text(data.market_sentiment);
+                        $('#market-sentiment').removeClass('text-success text-danger text-warning');
+                        if (data.market_sentiment === 'bullish') {
+                            $('#market-sentiment').addClass('text-success');
+                        } else if (data.market_sentiment === 'bearish') {
+                            $('#market-sentiment').addClass('text-danger');
+                        } else {
+                            $('#market-sentiment').addClass('text-warning');
+                        }
+                    }
+                },
+                error: function() {
+                    console.log('Error loading market sentiment');
+                }
+            });
+        }
+
+        function testAPI(endpoint) {
+            $.ajax({
+                url: 'http://localhost:8000' + endpoint,
+                method: 'GET',
+                success: function(data) {
+                    alert('API Test Success!\n\nResponse: ' + JSON.stringify(data, null, 2));
+                },
+                error: function(xhr) {
+                    alert('API Test Failed!\n\nStatus: ' + xhr.status + '\nResponse: ' + xhr.responseText);
+                }
+            });
+        }
+
+        function testFundamentalAPI() {
+            testAPI('/api/v1/fundamental/ratios/BBCA');
+        }
+
+        function testSentimentAPI() {
+            testAPI('/api/v1/sentiment/composite/BBCA');
+        }
+
+        function analyzeFundamental(symbol) {
+            $.ajax({
+                url: API_BASE + '/fundamental/ratios/' + symbol,
+                method: 'GET',
+                success: function(data) {
+                    alert('Fundamental Analysis for ' + symbol + ':\n\n' + JSON.stringify(data, null, 2));
+                },
+                error: function(xhr) {
+                    alert('Error analyzing ' + symbol + ':\n\n' + xhr.responseText);
+                }
+            });
+        }
+
+        function analyzeSentiment(symbol) {
+            $.ajax({
+                url: API_BASE + '/sentiment/composite/' + symbol,
+                method: 'GET',
+                success: function(data) {
+                    alert('Sentiment Analysis for ' + symbol + ':\n\n' + JSON.stringify(data, null, 2));
+                },
+                error: function(xhr) {
+                    alert('Error analyzing ' + symbol + ':\n\n' + xhr.responseText);
+                }
+            });
+        }
+
+        function analyzeTechnical(symbol) {
+            alert('Technical Analysis for ' + symbol + ' - Coming Soon!\n\nFeatures:\n- 50+ Technical Indicators\n- Pattern Recognition\n- Multi-timeframe Analysis');
+        }
+
+        function openScreener() {
+            alert('Stock Screener - Coming Soon!\n\nFeatures:\n- Multi-criteria Filtering\n- Technical + Fundamental + Sentiment\n- Real-time Updates');
+        }
+
+        function openFundamentalScreener() {
+            alert('Fundamental Screener - Coming Soon!\n\nFeatures:\n- Financial Ratios Filter\n- Valuation Metrics\n- Peer Comparison');
+        }
+
+        function openSentimentDashboard() {
+            alert('Sentiment Dashboard - Coming Soon!\n\nFeatures:\n- Fear & Greed Gauge\n- News Sentiment Feed\n- Social Media Trends');
+        }
+
+        function openTechnicalDashboard() {
+            alert('Technical Dashboard - Coming Soon!\n\nFeatures:\n- Interactive Charts\n- Technical Indicators\n- Pattern Recognition');
+        }
+
+        function trainModels() {
+            alert('ML Model Training - Coming Soon!\n\nFeatures:\n- LSTM Price Prediction\n- FinBERT Sentiment\n- Ensemble Methods');
+        }
+
+        function viewModelPerformance() {
+            alert('Model Performance - Coming Soon!\n\nFeatures:\n- Accuracy Metrics\n- Backtesting Results\n- Feature Importance');
+        }
+    </script>
+</body>
+</html>
