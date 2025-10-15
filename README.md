@@ -1,292 +1,310 @@
-# 🚀 Trading Platform Modern - AI-Powered 3-Pillar Analysis Platform
+# 🚀 Trading Platform Modern - AI-Powered 3-Pillar Analysis
 
-Platform trading profesional yang menggabungkan **Technical + Fundamental + Sentiment Analysis** untuk pasar saham Indonesia.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
+[![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.3+-purple.svg)](https://getbootstrap.com/)
 
-## ✨ Features
+## 📋 Overview
 
-### 📊 **Fundamental Analysis**
-- **30+ Financial Ratios**: ROE, ROA, Profit Margin, Current Ratio, Debt/Equity
-- **Valuation Models**: DCF, Graham Number, PE/PB Analysis
-- **Earnings Quality**: Consistency, Growth Analysis
-- **Peer Comparison**: Sector-based benchmarking
-- **Stock Screener**: Multi-criteria filtering
+Trading Platform Modern adalah aplikasi trading profesional yang mengintegrasikan analisis fundamental, sentiment, dan technical dalam satu platform yang powerful. Dibangun dengan teknologi modern dan menggunakan data sources gratis untuk memberikan pengalaman trading yang komprehensif.
 
-### 📰 **Sentiment Analysis**
-- **News Sentiment**: FinBERT, Polarity Analysis, Impact Scoring
-- **Social Media**: Twitter, Reddit, Facebook sentiment
-- **Market Indicators**: Fear & Greed Index, VIX, Put/Call Ratio
-- **Insider Activity**: Buy/Sell pattern analysis
-- **Composite Score**: Weighted sentiment from all sources
+## ✨ Key Features
 
-### 🤖 **AI/ML Models** (Coming Soon)
-- **LSTM**: Price prediction models
-- **FinBERT**: Financial sentiment analysis
-- **Ensemble Methods**: Model stacking and blending
-- **Feature Engineering**: 50+ technical indicators
+### 🔄 Real-Time Data & WebSocket
+- **WebSocket streaming** untuk data real-time
+- **Rate limiting** untuk API calls
+- **Smart caching** dengan Redis
+- **Multi-source data** integration (Yahoo Finance, web scraping)
 
-### 📈 **Technical Analysis** (Coming Soon)
-- **50+ Indicators**: MA, RSI, MACD, Bollinger Bands
-- **Pattern Recognition**: Candlestick, Chart patterns
-- **Multi-timeframe**: 1m, 5m, 15m, 1h, 1d analysis
+### 📊 Order Management System
+- **Training Mode**: Bot executes automatically untuk learning
+- **Real-Time Trading Mode**: Auto-trading toggle
+- **Order Types**: Market, Limit, Stop-Loss, Trailing Stop, OCO, Bracket
+- **Position tracking** dan P&L calculations
 
-### 🛡️ **Risk Management** (Coming Soon)
-- **Position Sizing**: Kelly Criterion, Fixed Fractional
-- **VaR & CVaR**: Portfolio risk calculation
-- **Drawdown Control**: Circuit breakers
-- **Portfolio Optimization**: Risk-adjusted returns
+### 📈 Multi-Timeframe Analysis
+- **Supported Timeframes**: 1M, 3M, 6M, 1Y, 5M, 15M, 1H, 4H, 1D, 1W, 1M
+- **Lightweight Charts** integration (free TradingView library)
+- **Technical indicators** dengan TA-Lib
+- **Pattern recognition** dan multi-timeframe analysis
+
+### 🎯 Advanced Analytics
+- **Backtesting framework** dengan performance metrics
+- **Pattern recognition** untuk chart patterns
+- **Sentiment analysis** dari Reddit, Twitter, Google Trends
+- **Economic calendar** integration
+- **Earnings calendar** dan corporate actions
+
+### 🎓 Educational Content System
+- **Content Management**: Videos, articles, tutorials, webinars, podcasts, ebooks, courses
+- **Trading Journal**: P&L tracking, lessons learned, mistakes analysis
+- **Learning Paths**: Structured learning dengan progress tracking
+- **Trading Goals**: Goal setting dan achievement tracking
+- **Quizzes**: Assessment system dengan analytics
+
+### 🔔 Smart Notifications
+- **In-app notifications** untuk alerts
+- **Price alerts** dan indicator notifications
+- **Pattern alerts** dan sentiment alerts
+- **Economic calendar** alerts
+
+### 🛡️ Security & Backup
+- **Development-friendly security** (single user)
+- **Database backup** ke phpMyAdmin
+- **Tax lot tracking** (FIFO/LIFO) dengan format Indonesia
+- **Session management** dan audit logging
+
+### 📱 PWA Features
+- **Progressive Web App** capabilities
+- **Offline viewing** dengan smart caching
+- **Installable** web app
+- **Mobile-responsive** design
 
 ## 🏗️ Architecture
 
+### Backend (FastAPI)
 ```
-[Data Sources] → [ETL Pipeline] → [Analysis Engines] → [API Layer] → [Frontend]
-     ↓              ↓                ↓                ↓            ↓
-[IDX Data]    [Data Quality]   [Fundamental]     [FastAPI]    [Dashboard]
-[News API]    [Feature Eng]    [Sentiment]       [REST API]   [Charts]
-[Social Media] [Sentiment]      [Technical]       [WebSocket]  [Analytics]
+backend/
+├── app/
+│   ├── models/          # SQLAlchemy models
+│   ├── services/        # Business logic
+│   ├── api/            # FastAPI endpoints
+│   └── websocket/      # WebSocket server
+├── scripts/            # Utility scripts
+└── requirements.txt    # Dependencies
 ```
 
-## 🛠️ Tech Stack
-
-### Backend
-- **FastAPI** - Async REST API
-- **SQLAlchemy** - ORM
-- **MySQL** - Database (existing `scalper` database)
-- **Redis** - Caching & session
-- **Celery** - Background tasks
-
-### AI/ML
-- **PyTorch** - Deep learning
-- **Transformers** - FinBERT sentiment
-- **scikit-learn** - Classical ML
-- **TA-Lib** - Technical indicators
-- **Optuna** - Hyperparameter tuning
-
-### Frontend
-- **HTML5 + Bootstrap 5** - Responsive UI
-- **jQuery** - DOM manipulation
-- **Lightweight Charts** - Interactive charts
-- **DataTables** - Advanced tables
+### Frontend (Bootstrap 5)
+```
+frontend/
+├── pages/              # HTML pages
+├── js/                 # JavaScript files
+├── manifest.json       # PWA manifest
+├── sw.js              # Service worker
+└── icons/             # PWA icons
+```
 
 ## 🚀 Quick Start
 
-### 1. **Setup Environment**
+### Prerequisites
+- Python 3.8+
+- MySQL 8.0+
+- Redis 6.0+
+- Node.js 16+ (optional untuk development)
+
+### Installation
+
+1. **Clone Repository**
 ```bash
-cd trading-platform-modern/backend
+git clone https://github.com/82080038/modern.git
+cd modern
+```
+
+2. **Backend Setup**
+```bash
+cd backend
 pip install -r requirements.txt
 ```
 
-### 2. **Database Setup**
-- Ensure MySQL server running
-- Database `scalper` already exists
-- Tables will be created automatically
-
-### 3. **Run Server**
+3. **Database Setup**
 ```bash
-python run_server.py
+# Create MySQL database
+mysql -u root -p
+CREATE DATABASE trading_platform;
 ```
 
-### 4. **Access Application**
-- **Main App**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
-
-## 📊 API Endpoints
-
-### Fundamental Analysis
-- `GET /api/v1/fundamental/ratios/{symbol}` - Financial ratios
-- `GET /api/v1/fundamental/dcf/{symbol}` - DCF valuation
-- `GET /api/v1/fundamental/graham/{symbol}` - Graham Number
-- `GET /api/v1/fundamental/earnings-quality/{symbol}` - Earnings analysis
-- `GET /api/v1/fundamental/score/{symbol}` - Fundamental score
-- `GET /api/v1/fundamental/peer-comparison/{symbol}` - Peer analysis
-- `GET /api/v1/fundamental/screener` - Stock screener
-
-### Sentiment Analysis
-- `GET /api/v1/sentiment/news/{symbol}` - News sentiment
-- `GET /api/v1/sentiment/social/{symbol}` - Social media sentiment
-- `GET /api/v1/sentiment/market` - Market sentiment indicators
-- `GET /api/v1/sentiment/insider/{symbol}` - Insider activity
-- `GET /api/v1/sentiment/composite/{symbol}` - Composite sentiment
-- `GET /api/v1/sentiment/alerts/{symbol}` - Sentiment alerts
-- `GET /api/v1/sentiment/dashboard` - Multi-symbol dashboard
-- `GET /api/v1/sentiment/screener` - Sentiment screener
-
-## 💡 Usage Examples
-
-### Fundamental Analysis
+4. **Environment Configuration**
 ```bash
-# Get financial ratios for BBCA
-curl "http://localhost:8000/api/v1/fundamental/ratios/BBCA"
-
-# DCF valuation
-curl "http://localhost:8000/api/v1/fundamental/dcf/BBCA?current_price=8500"
-
-# Stock screener
-curl "http://localhost:8000/api/v1/fundamental/screener?min_roe=15&max_pe=20"
+# Create .env file
+cp .env.example .env
+# Edit .env with your database credentials
 ```
 
-### Sentiment Analysis
+5. **Run Application**
 ```bash
-# Composite sentiment
-curl "http://localhost:8000/api/v1/sentiment/composite/BBCA"
+# Start backend
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-# News sentiment
-curl "http://localhost:8000/api/v1/sentiment/news/BBCA?days=7"
-
-# Market sentiment
-curl "http://localhost:8000/api/v1/sentiment/market"
+# Start frontend (serve static files)
+# Open http://localhost:8000 in browser
 ```
 
-## 📁 Project Structure
+## 📊 Data Sources (Free)
 
-```
-trading-platform-modern/
-├── backend/
-│   ├── app/
-│   │   ├── api/              # FastAPI endpoints
-│   │   │   ├── fundamental.py # Fundamental analysis API
-│   │   │   └── sentiment.py  # Sentiment analysis API
-│   │   ├── core/             # Business logic
-│   │   │   ├── fundamental.py # Fundamental analysis engine
-│   │   │   └── sentiment.py  # Sentiment analysis engine
-│   │   ├── models/           # Database models
-│   │   │   ├── fundamental.py # Fundamental data models
-│   │   │   └── sentiment.py  # Sentiment data models
-│   │   ├── config.py        # Configuration
-│   │   └── database.py      # DB connections
-│   ├── main.py              # FastAPI app
-│   ├── run_server.py        # Server runner
-│   └── requirements.txt     # Dependencies
-├── frontend/                # Coming soon
-├── data/                    # Data storage
-├── docker/                  # Docker configuration
-├── scripts/                 # Utility scripts
-├── docs/                    # Documentation
-└── README.md
-```
+- **Yahoo Finance**: Historical dan real-time data
+- **IDX.co.id**: Indonesian stock data via web scraping
+- **Investing.com**: Economic calendar dan market data
+- **Reddit**: WallStreetBets sentiment analysis
+- **Twitter**: Social sentiment tracking
+- **Google Trends**: Market trend analysis
 
-## 🎯 Development Roadmap
+## 🛠️ Technical Stack
 
-### Phase 1: Foundation ✅
-- [x] Database schema design
-- [x] FastAPI project structure
-- [x] Fundamental analysis engine
-- [x] Sentiment analysis engine
-- [x] API endpoints
+### Backend
+- **FastAPI**: Modern web framework
+- **SQLAlchemy**: ORM untuk database
+- **MySQL**: Primary database
+- **Redis**: Caching dan session storage
+- **Celery**: Background task processing
+- **python-socketio**: WebSocket server
 
-### Phase 2: Data Integration (Next)
-- [ ] Real-time market data
-- [ ] News scraping pipeline
-- [ ] Social media integration
-- [ ] Data quality control
+### Frontend
+- **Bootstrap 5**: Responsive UI framework
+- **jQuery**: JavaScript library
+- **ApexCharts**: Advanced charting
+- **Lightweight Charts**: Free TradingView charts
+- **DataTables**: Table management
+- **Chart.js**: Analytics charts
 
-### Phase 3: Technical Analysis
-- [ ] 50+ technical indicators
-- [ ] Pattern recognition
-- [ ] Multi-timeframe analysis
-- [ ] Technical signals
+### Data Processing
+- **TA-Lib**: Technical analysis indicators
+- **pandas**: Data manipulation
+- **BeautifulSoup4**: Web scraping
+- **yfinance**: Yahoo Finance API
+- **pytrends**: Google Trends API
 
-### Phase 4: AI/ML Models
-- [ ] LSTM price prediction
-- [ ] FinBERT sentiment
-- [ ] Ensemble methods
-- [ ] Model training pipeline
+## 📈 Features Implementation
 
-### Phase 5: Advanced Features
-- [ ] Backtesting framework
-- [ ] Risk management
-- [ ] Portfolio optimization
-- [ ] Real-time trading
+### ✅ Completed Features
+- [x] Real-Time Data & WebSocket Implementation
+- [x] Order Management System (Training/Real-Time modes)
+- [x] Multi-Timeframe Support (1M to 1Y)
+- [x] Alert Notification System (in-app)
+- [x] Enhanced Security Features (development mode)
+- [x] Tax Lot Tracking (FIFO/LIFO) Indonesian format
+- [x] Database Backup System
+- [x] PWA Features (manifest, service worker)
+- [x] Smart Data Caching (Redis)
+- [x] Lightweight Charts Integration
+- [x] Backtesting Framework
+- [x] Advanced Watchlist
+- [x] Pattern Recognition
+- [x] Widget-based Dashboard
+- [x] Earnings Calendar
+- [x] Sentiment Scraping
+- [x] Economic Calendar
+- [x] Web Scraping Infrastructure
+- [x] Educational Content System
 
-## 🔧 Configuration
+## 🎯 Use Cases
 
-### Environment Variables
-```bash
-# Database
-DATABASE_URL=mysql+pymysql://root:@localhost:3306/scalper
-REDIS_URL=redis://localhost:6379/0
+### For Individual Traders
+- **Paper Trading**: Practice tanpa real money
+- **Strategy Testing**: Backtest strategies dengan historical data
+- **Learning**: Educational content dan trading journal
+- **Analysis**: Comprehensive 3-pillar analysis
 
-# API Keys (optional)
-ALPHA_VANTAGE_API_KEY=your_key_here
-NEWS_API_KEY=your_key_here
-TWITTER_API_KEY=your_key_here
+### For Developers
+- **Open Source**: Full source code available
+- **Extensible**: Modular architecture
+- **Free Tools**: No paid dependencies
+- **Documentation**: Comprehensive API docs
 
-# Trading Configuration
-PAPER_TRADING_MODE=true
-VIRTUAL_BALANCE=10000000.0
-COMMISSION_RATE=0.0015
-SLIPPAGE_RATE=0.0005
-```
+## 📱 Mobile Support
 
-## 📊 Supported Analysis
+- **Progressive Web App** (PWA)
+- **Responsive Design** untuk semua devices
+- **Touch-friendly** controls
+- **Offline capability** dengan smart caching
 
-### Fundamental Analysis
-- **Profitability**: ROE, ROA, Profit Margin, Operating Margin
-- **Liquidity**: Current Ratio, Quick Ratio, Cash Ratio
-- **Leverage**: Debt/Equity, Debt/Assets, Interest Coverage
-- **Efficiency**: Asset Turnover, Inventory Turnover
-- **Valuation**: PE, PB, PS, PEG, EV/EBITDA
-- **Growth**: EPS Growth, Revenue Growth, Book Value Growth
+## 🔧 Development
 
-### Sentiment Analysis
-- **News Sentiment**: Polarity, Subjectivity, Confidence
-- **Social Sentiment**: Engagement-weighted scoring
-- **Market Sentiment**: Fear & Greed Index, VIX, Breadth
-- **Insider Activity**: Buy/Sell patterns, Net activity
-- **Composite Score**: Weighted average from all sources
+### API Documentation
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI Schema**: http://localhost:8000/openapi.json
 
-## 🛡️ Risk Management
+### Database Schema
+- **Models**: SQLAlchemy models di `backend/app/models/`
+- **Migrations**: Alembic untuk database migrations
+- **Backup**: Automated backup scripts
 
-### Position Sizing
-- Fixed fractional: 1-2% risk per trade
-- Kelly Criterion: Optimal position sizing
-- Volatility-adjusted sizing
+### Testing
+- **Unit Tests**: pytest framework
+- **Integration Tests**: API endpoint testing
+- **Performance Tests**: Load testing dengan locust
 
-### Portfolio Limits
-- Max position size: 10% of portfolio
-- Daily loss limit: 2%
-- Max drawdown: 15%
+## 📊 Performance
 
-## 📈 Performance Metrics
+### Optimization Features
+- **Database Indexing**: Optimized queries
+- **Redis Caching**: Frequently accessed data
+- **Lazy Loading**: Charts dan large datasets
+- **Connection Pooling**: Database connections
+- **Background Tasks**: Heavy computations
 
-- **Fundamental Score**: 0-100 rating system
-- **Sentiment Score**: -1 to +1 scale
-- **Composite Score**: Weighted combination
-- **Confidence Level**: 0 to 1 scale
-- **Trend Analysis**: Improving/Declining/Stable
+### Monitoring
+- **Health Checks**: System status monitoring
+- **Performance Metrics**: Response time tracking
+- **Error Logging**: Comprehensive error tracking
+- **Usage Analytics**: Feature usage statistics
+
+## 🛡️ Security
+
+### Development Mode
+- **Relaxed Security**: Single user development
+- **Local Development**: localhost only
+- **Easy Debugging**: Comprehensive logging
+
+### Production Ready
+- **Authentication**: JWT token-based
+- **Authorization**: Role-based access control
+- **Rate Limiting**: API protection
+- **Input Validation**: Pydantic models
+- **Audit Logging**: User activity tracking
+
+## 📚 Documentation
+
+- **API Docs**: Comprehensive endpoint documentation
+- **User Guide**: Step-by-step usage guide
+- **Developer Guide**: Architecture dan extension guide
+- **Troubleshooting**: Common issues dan solutions
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Create Pull Request
+1. Fork repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
 ## 📄 License
 
-MIT License - see LICENSE file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🙏 Acknowledgments
 
-For issues and questions:
-- Create GitHub issue
-- Check API documentation at `/docs`
-- Review logs in console output
+- **TradingView**: Lightweight Charts library
+- **FastAPI**: Modern web framework
+- **Bootstrap**: UI framework
+- **Open Source Community**: All contributors
+
+## 📞 Support
+
+- **Issues**: GitHub Issues untuk bug reports
+- **Discussions**: GitHub Discussions untuk questions
+- **Documentation**: Comprehensive docs di repository
+
+## 🚀 Roadmap
+
+### Future Enhancements
+- [ ] Email Notifications (SMTP integration)
+- [ ] Advanced Analytics (ML integration)
+- [ ] Mobile App (React Native/Flutter)
+- [ ] API Monetization (Premium data sources)
+- [ ] Social Features (Community features)
+
+### Production Deployment
+- [ ] Environment Setup (Production database)
+- [ ] Security Hardening (Full security implementation)
+- [ ] Monitoring (Logging dan monitoring)
+- [ ] Scaling (Load balancing dan scaling)
 
 ---
 
-**🚀 Ready to start your AI-powered trading analysis journey!**
+**Built with ❤️ using free/open-source tools**
 
-### Quick Test Commands
+**Total Files**: 50+ | **Lines of Code**: 10,000+ | **Features**: 19 Major Features
 
-```bash
-# Test fundamental analysis
-curl "http://localhost:8000/api/v1/fundamental/ratios/BBCA"
-
-# Test sentiment analysis  
-curl "http://localhost:8000/api/v1/sentiment/composite/BBCA"
-
-# Test health check
-curl "http://localhost:8000/health"
-```
+*Trading Platform Modern - Professional Trading Analysis Made Simple*
