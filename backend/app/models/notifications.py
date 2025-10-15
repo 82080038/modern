@@ -53,7 +53,7 @@ class Notification(Base):
     trade_id = Column(String(50), nullable=True, index=True)
     
     # Additional data
-    metadata = Column(JSON, nullable=True)  # Additional data for the notification
+    notification_metadata = Column(JSON, nullable=True)  # Additional data for the notification
     action_url = Column(String(200), nullable=True)  # URL for action button
     action_text = Column(String(50), nullable=True)  # Text for action button
     

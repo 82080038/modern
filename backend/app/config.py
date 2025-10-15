@@ -4,6 +4,7 @@ Configuration settings for Trading Platform Modern
 import os
 from typing import Optional
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 class Settings(BaseSettings):
     # Database Configuration
@@ -46,13 +47,18 @@ class Settings(BaseSettings):
     MARKET_HOURS_START: str = "09:00"
     MARKET_HOURS_END: str = "16:00"
     
+    # Security Configuration
+    TWO_FACTOR_ENABLED: bool = False  # Disable for development, enable for production
+    TWO_FACTOR_ISSUER: str = "Trading Platform Modern"
+    
     # Logging
     LOG_LEVEL: str = "INFO"
     LOG_FILE: str = "logs/trading_platform.log"
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = ConfigDict(
+        env_file=".env",
+        case_sensitive=True
+    )
 
 # Global settings instance
 settings = Settings()

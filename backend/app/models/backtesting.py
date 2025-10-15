@@ -77,36 +77,7 @@ class Backtest(Base):
     equity_curve = Column(JSON, nullable=True)  # Daily equity values
     trade_log = Column(JSON, nullable=True)     # All trades executed
 
-class Strategy(Base):
-    """Trading strategies"""
-    __tablename__ = "strategies"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    strategy_id = Column(String(50), unique=True, nullable=False, index=True)
-    
-    # Strategy details
-    name = Column(String(100), nullable=False)
-    description = Column(Text, nullable=True)
-    strategy_type = Column(Enum(StrategyType), nullable=False)
-    
-    # Strategy parameters
-    parameters = Column(JSON, nullable=True)
-    buy_conditions = Column(JSON, nullable=True)
-    sell_conditions = Column(JSON, nullable=True)
-    
-    # Strategy settings
-    is_active = Column(Boolean, default=True)
-    is_public = Column(Boolean, default=False)
-    
-    # Performance tracking
-    total_backtests = Column(Integer, default=0)
-    avg_return = Column(Float, default=0.0)
-    best_return = Column(Float, default=0.0)
-    worst_return = Column(Float, default=0.0)
-    
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+# Strategy model moved to trading.py to avoid conflicts
 
 class BacktestTrade(Base):
     """Individual trades from backtests"""

@@ -105,7 +105,7 @@ async def create_order(
             raise HTTPException(status_code=400, detail=result["error"])
         
         # Get created order details
-        order = db.query(trading_service.db.query(Order).filter(
+        order = db.query(Order).filter(
             Order.order_id == result["order_id"]
         ).first()
         

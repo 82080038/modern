@@ -240,3 +240,47 @@ class RiskMetrics(Base):
     position_count = Column(Integer, nullable=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class Strategy(Base):
+    """Trading Strategy model"""
+    __tablename__ = "strategies"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    strategy_type = Column(String(50), default="custom")
+    is_active = Column(Boolean, default=False)
+    portfolio_id = Column(Integer, nullable=True)  # Link to portfolio
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+class StrategyRule(Base):
+    """Strategy Rule model"""
+    __tablename__ = "strategy_rules"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    strategy_id = Column(Integer, nullable=False, index=True)
+    rule_type = Column(String(50), nullable=False)
+    condition = Column(Text, nullable=False)
+    action = Column(String(50), nullable=False)
+    parameters = Column(JSON, nullable=True)
+    order = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class StrategyBacktest(Base):
+    """Strategy Backtest model"""
+    __tablename__ = "strategy_backtests"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    strategy_id = Column(Integer, nullable=False, index=True)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    initial_capital = Column(Float, nullable=False)
+    final_capital = Column(Float, nullable=False)
+    total_return = Column(Float, nullable=False)
+    sharpe_ratio = Column(Float, nullable=True)
+    max_drawdown = Column(Float, nullable=True)
+    win_rate = Column(Float, nullable=True)
+    total_trades = Column(Integer, nullable=True)
+    backtest_data = Column(JSON, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -3,7 +3,7 @@ Smart Data Caching Service
 Mencegah re-downloading data yang sudah ada untuk menghemat waktu dan kuota
 """
 from sqlalchemy.orm import Session
-from app.models.market_data import CandlestickData, RealtimePrice
+from app.models.market_data import MarketData, HistoricalData
 from app.services.data_service import DataService
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
@@ -90,12 +90,12 @@ class CacheService:
         try:
             # Check if we have data in database
             if not force_refresh:
-                db_data = self.db.query(CandlestickData).filter(
-                    CandlestickData.symbol == symbol.upper(),
-                    CandlestickData.timeframe == timeframe,
-                    CandlestickData.timestamp >= start_date,
-                    CandlestickData.timestamp <= end_date
-                ).order_by(CandlestickData.timestamp).all()
+                db_data = self.db.query(HistoricalData).filter(
+                    HistoricalData.symbol == symbol.upper(),
+                    HistoricalData.timeframe == timeframe,
+                    HistoricalData.date >= start_date.date(),
+                    HistoricalData.date <= end_date.date()
+                ).order_by(HistoricalData.timestamp).all()
                 
                 if db_data:
                     logger.info(f"Found {len(db_data)} candlestick data points in DB for {symbol} {timeframe}")
@@ -115,21 +115,22 @@ class CacheService:
             for item in external_data:
                 try:
                     # Check if already exists
-                    existing = self.db.query(CandlestickData).filter(
-                        CandlestickData.symbol == symbol.upper(),
-                        CandlestickData.timeframe == timeframe,
-                        CandlestickData.timestamp == item['timestamp']
+                    existing = self.db.query(HistoricalData).filter(
+                        HistoricalData.symbol == symbol.upper(),
+                        HistoricalData.timeframe == timeframe,
+                        HistoricalData.timestamp == item['timestamp']
                     ).first()
                     
                     if not existing:
-                        db_candlestick = CandlestickData(
+                        db_candlestick = HistoricalData(
                             symbol=symbol.upper(),
                             timeframe=timeframe,
+                            date=item['timestamp'].date(),
                             timestamp=item['timestamp'],
-                            open=item['open'],
-                            high=item['high'],
-                            low=item['low'],
-                            close=item['close'],
+                            open_price=item['open'],
+                            high_price=item['high'],
+                            low_price=item['low'],
+                            close_price=item['close'],
                             volume=item['volume']
                         )
                         self.db.add(db_candlestick)
@@ -179,9 +180,13 @@ class CacheService:
                 
                 # Store in database
                 try:
-                    db_price = RealtimePrice(
+                    db_price = MarketData(
                         symbol=symbol.upper(),
-                        price=price_data['price']
+                        timestamp=datetime.now(),
+                        last_price=price_data['price'],
+                        change=price_data.get('change'),
+                        change_percent=price_data.get('change_percent'),
+                        volume=price_data.get('volume')
                     )
                     self.db.add(db_price)
                     self.db.commit()
@@ -268,21 +273,21 @@ class CacheService:
             timeframes = ['1m', '5m', '15m', '1h', '4h', '1D', '1W', '1M']
             
             for tf in timeframes:
-                count = self.db.query(CandlestickData).filter(
-                    CandlestickData.symbol == symbol.upper(),
-                    CandlestickData.timeframe == tf
+                count = self.db.query(HistoricalData).filter(
+                    HistoricalData.symbol == symbol.upper(),
+                    HistoricalData.timeframe == tf
                 ).count()
                 
                 if count > 0:
-                    earliest = self.db.query(CandlestickData).filter(
-                        CandlestickData.symbol == symbol.upper(),
-                        CandlestickData.timeframe == tf
-                    ).order_by(CandlestickData.timestamp.asc()).first()
+                    earliest = self.db.query(HistoricalData).filter(
+                        HistoricalData.symbol == symbol.upper(),
+                        HistoricalData.timeframe == tf
+                    ).order_by(HistoricalData.timestamp.asc()).first()
                     
-                    latest = self.db.query(CandlestickData).filter(
-                        CandlestickData.symbol == symbol.upper(),
-                        CandlestickData.timeframe == tf
-                    ).order_by(CandlestickData.timestamp.desc()).first()
+                    latest = self.db.query(HistoricalData).filter(
+                        HistoricalData.symbol == symbol.upper(),
+                        HistoricalData.timeframe == tf
+                    ).order_by(HistoricalData.timestamp.desc()).first()
                     
                     candlestick_coverage[tf] = {
                         'count': count,
@@ -291,8 +296,8 @@ class CacheService:
                     }
             
             # Check realtime data coverage
-            realtime_count = self.db.query(RealtimePrice).filter(
-                RealtimePrice.symbol == symbol.upper()
+            realtime_count = self.db.query(MarketData).filter(
+                MarketData.symbol == symbol.upper()
             ).count()
             
             return {
@@ -312,13 +317,13 @@ class CacheService:
             cutoff_date = datetime.now() - timedelta(days=days)
             
             # Clean up old realtime prices
-            realtime_deleted = self.db.query(RealtimePrice).filter(
-                RealtimePrice.timestamp < cutoff_date
+            realtime_deleted = self.db.query(MarketData).filter(
+                MarketData.timestamp < cutoff_date
             ).delete()
             
             # Clean up old candlestick data (keep more recent data)
-            candlestick_deleted = self.db.query(CandlestickData).filter(
-                CandlestickData.timestamp < cutoff_date
+            candlestick_deleted = self.db.query(HistoricalData).filter(
+                HistoricalData.timestamp < cutoff_date
             ).delete()
             
             self.db.commit()
@@ -354,8 +359,8 @@ class CacheService:
                     logger.warning(f"Redis info error: {e}")
             
             # Database stats
-            candlestick_count = self.db.query(CandlestickData).count()
-            realtime_count = self.db.query(RealtimePrice).count()
+            candlestick_count = self.db.query(HistoricalData).count()
+            realtime_count = self.db.query(MarketData).count()
             
             stats['database_stats'] = {
                 'candlestick_records': candlestick_count,
@@ -390,14 +395,14 @@ class CacheService:
             logger.error(f"Error clearing cache: {e}")
             return {'error': str(e)}
     
-    def _candlestick_to_dict(self, candle: CandlestickData) -> Dict:
+    def _candlestick_to_dict(self, candle: HistoricalData) -> Dict:
         """Convert candlestick model to dict"""
         return {
             'timestamp': candle.timestamp.isoformat(),
-            'open': candle.open,
-            'high': candle.high,
-            'low': candle.low,
-            'close': candle.close,
+            'open': candle.open_price,
+            'high': candle.high_price,
+            'low': candle.low_price,
+            'close': candle.close_price,
             'volume': candle.volume
         }
     

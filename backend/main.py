@@ -5,9 +5,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from contextlib import asynccontextmanager
 import uvicorn
-import os
-from app.api import fundamental, sentiment, market_data, trading, notifications, security, tax, backup, cache, backtesting, watchlist, pattern, dashboard, earnings, sentiment_scraping, economic_calendar, web_scraping
+from app.api import fundamental, sentiment, market_data, trading, notifications, security, tax, backup, cache, backtesting, watchlist, pattern, dashboard, earnings, sentiment_scraping, economic_calendar, web_scraping, educational, two_factor, performance_analytics, portfolio_heatmap, strategy_builder, algorithmic_trading
 from app.database import engine, Base
 from app.config import settings
 from app.websocket.websocket_server import sio, start_websocket_server, stop_websocket_server
@@ -17,13 +17,39 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Lifespan event handler
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan management"""
+    # Startup
+    try:
+        # Create all tables
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created successfully")
+        
+        # Start WebSocket server
+        await start_websocket_server(app)
+        logger.info("WebSocket server started")
+    except Exception as e:
+        logger.error(f"Startup error: {e}")
+    
+    yield
+    
+    # Shutdown
+    try:
+        await stop_websocket_server()
+        logger.info("WebSocket server stopped")
+    except Exception as e:
+        logger.error(f"Shutdown error: {e}")
+
 # Create FastAPI app
 app = FastAPI(
     title="Trading Platform Modern",
     description="AI-Powered Trading Platform with 3-Pillar Analysis: Technical + Fundamental + Sentiment",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # CORS middleware
@@ -35,29 +61,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Create database tables
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database tables"""
-    try:
-        # Create all tables
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database tables created successfully")
-        
-        # Start WebSocket server
-        await start_websocket_server(app)
-        logger.info("WebSocket server started")
-    except Exception as e:
-        logger.error(f"Error creating database tables: {e}")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Shutdown event"""
-    try:
-        await stop_websocket_server()
-        logger.info("WebSocket server stopped")
-    except Exception as e:
-        logger.error(f"Error stopping WebSocket server: {e}")
+# Event handlers moved to lifespan function above
 
 # Include API routers
 app.include_router(fundamental.router, prefix="/api/v1")
@@ -77,6 +81,12 @@ app.include_router(earnings.router, prefix="/api/v1")
 app.include_router(sentiment_scraping.router, prefix="/api/v1")
 app.include_router(economic_calendar.router, prefix="/api/v1")
 app.include_router(web_scraping.router, prefix="/api/v1")
+app.include_router(educational.router, prefix="/api/v1")
+app.include_router(two_factor.router, prefix="/api/v1")
+app.include_router(performance_analytics.router, prefix="/api/v1")
+app.include_router(portfolio_heatmap.router, prefix="/api/v1")
+app.include_router(strategy_builder.router, prefix="/api/v1")
+app.include_router(algorithmic_trading.router, prefix="/api/v1")
 
 # Mount SocketIO app
 app.mount("/socket.io", sio)

@@ -3,9 +3,10 @@ Backtesting Service untuk Strategy Testing
 """
 from sqlalchemy.orm import Session
 from app.models.backtesting import (
-    Backtest, Strategy, BacktestTrade, BacktestMetrics, StrategyOptimization, MonteCarloSimulation,
+    Backtest, BacktestTrade, BacktestMetrics, StrategyOptimization, MonteCarloSimulation,
     StrategyType, BacktestStatus
 )
+from app.models.trading import Strategy
 from app.services.data_service import DataService
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, date, timedelta

@@ -6,7 +6,10 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict
 from datetime import datetime
 from app.database import get_db
-from app.scripts.backup_database import DatabaseBackup
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+from scripts.backup_database import DatabaseBackup
 from pydantic import BaseModel
 import logging
 import os
