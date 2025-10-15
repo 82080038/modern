@@ -20,7 +20,7 @@ class DatabaseBackup:
                  port: int = 3306,
                  username: str = "root",
                  password: str = "",
-                 database: str = "trading_platform",
+                 database: str = "scalper",
                  backup_dir: str = "backups"):
         self.host = host
         self.port = port
@@ -291,7 +291,7 @@ def main():
     parser.add_argument("--port", type=int, default=3306, help="MySQL port")
     parser.add_argument("--username", default="root", help="MySQL username")
     parser.add_argument("--password", default="", help="MySQL password")
-    parser.add_argument("--database", default="trading_platform", help="Database name")
+    parser.add_argument("--database", default="scalper", help="Database name")
     parser.add_argument("--backup-dir", default="backups", help="Backup directory")
     parser.add_argument("--action", choices=["backup", "restore", "list", "cleanup"], required=True, help="Action to perform")
     parser.add_argument("--backup-file", help="Backup file for restore action")

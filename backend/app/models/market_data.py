@@ -149,3 +149,52 @@ class SymbolInfo(Base):
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+class TechnicalIndicators(Base):
+    """Technical indicators data"""
+    __tablename__ = "technical_indicators"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    symbol = Column(String(20), nullable=False, index=True)
+    date = Column(Date, nullable=False, index=True)
+    
+    # Technical Indicators
+    rsi = Column(Float, nullable=True)
+    macd = Column(Float, nullable=True)
+    macd_signal = Column(Float, nullable=True)
+    macd_histogram = Column(Float, nullable=True)
+    sma_20 = Column(Float, nullable=True)
+    sma_50 = Column(Float, nullable=True)
+    sma_200 = Column(Float, nullable=True)
+    ema_12 = Column(Float, nullable=True)
+    ema_26 = Column(Float, nullable=True)
+    bollinger_upper = Column(Float, nullable=True)
+    bollinger_middle = Column(Float, nullable=True)
+    bollinger_lower = Column(Float, nullable=True)
+    atr = Column(Float, nullable=True)
+    adx = Column(Float, nullable=True)
+    stochastic_k = Column(Float, nullable=True)
+    stochastic_d = Column(Float, nullable=True)
+    williams_r = Column(Float, nullable=True)
+    cci = Column(Float, nullable=True)
+    obv = Column(BigInteger, nullable=True)
+    volume_sma = Column(Float, nullable=True)
+    
+    # Trend Analysis
+    trend = Column(String(20), nullable=True)
+    
+    # AI Analysis
+    ai_pattern_strength = Column(Float, nullable=True)
+    ai_gap_accuracy = Column(Float, nullable=True)
+    ai_order_book_efficiency = Column(Float, nullable=True)
+    ai_mean_reversion_score = Column(Float, nullable=True)
+    ai_overall_score = Column(Float, nullable=True)
+    
+    # Metadata
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Indexes
+    __table_args__ = (
+        Index('idx_symbol_date_technical', 'symbol', 'date'),
+        Index('idx_date_technical', 'date'),
+    )

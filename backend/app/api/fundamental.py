@@ -59,11 +59,32 @@ async def get_financial_ratios(
         if not period_date:
             period_date = date.today()
         
-        engine = FundamentalAnalysisEngine(db)
-        ratios = engine.calculate_financial_ratios(symbol, period_date)
+        # Use existing company_fundamentals table
+        from sqlalchemy import text
         
-        if "error" in ratios:
-            raise HTTPException(status_code=404, detail=ratios["error"])
+        result = db.execute(text("""
+            SELECT * FROM company_fundamentals 
+            WHERE symbol = :symbol 
+            ORDER BY date DESC 
+            LIMIT 1
+        """), {"symbol": symbol})
+        
+        row = result.fetchone()
+        
+        if not row:
+            raise HTTPException(status_code=404, detail="Symbol not found in database")
+        
+        # Convert to ratios format
+        ratios = {
+            "roe": float(row.roe) if row.roe else None,
+            "roa": float(row.roa) if row.roa else None,
+            "profit_margin": float(row.profit_margin) if row.profit_margin else None,
+            "pe_ratio": float(row.pe_ratio) if row.pe_ratio else None,
+            "price_book": float(row.price_book) if row.price_book else None,
+            "debt_equity": float(row.debt_equity) if row.debt_equity else None,
+            "beta": float(row.beta) if row.beta else None,
+            "dividend_yield": float(row.dividend_yield) if row.dividend_yield else None
+        }
         
         # Organize ratios by category
         response = {
@@ -233,43 +254,53 @@ async def fundamental_screener(
 ):
     """Screen stocks based on fundamental criteria"""
     try:
-        from app.models.fundamental import FinancialRatios, CompanyProfile
+        # Use existing company_fundamentals table from database
+        from sqlalchemy import text
         
-        # Build query
-        query = db.query(FinancialRatios).join(CompanyProfile)
-        
-        if sector:
-            query = query.filter(CompanyProfile.sector == sector)
+        # Build query using raw SQL for existing table
+        query_parts = ["SELECT * FROM company_fundamentals WHERE 1=1"]
+        params = {}
         
         if min_roe is not None:
-            query = query.filter(FinancialRatios.roe >= min_roe)
+            query_parts.append("AND roe >= :min_roe")
+            params['min_roe'] = min_roe
         
         if max_pe is not None:
-            query = query.filter(FinancialRatios.pe_ratio <= max_pe)
+            query_parts.append("AND pe_ratio <= :max_pe")
+            params['max_pe'] = max_pe
         
         if min_profit_margin is not None:
-            query = query.filter(FinancialRatios.profit_margin >= min_profit_margin)
+            query_parts.append("AND profit_margin >= :min_profit_margin")
+            params['min_profit_margin'] = min_profit_margin
         
         if max_debt_equity is not None:
-            query = query.filter(FinancialRatios.debt_to_equity <= max_debt_equity)
+            query_parts.append("AND debt_equity <= :max_debt_equity")
+            params['max_debt_equity'] = max_debt_equity
         
         if min_current_ratio is not None:
-            query = query.filter(FinancialRatios.current_ratio >= min_current_ratio)
+            # Note: current_ratio not available in company_fundamentals
+            pass
         
-        # Get results
-        results = query.limit(limit).all()
+        query_parts.append(f"ORDER BY roe DESC LIMIT {limit}")
+        query_sql = " ".join(query_parts)
+        
+        result = db.execute(text(query_sql), params)
+        results = result.fetchall()
         
         # Format response
         screened_stocks = []
-        for ratio in results:
+        for row in results:
             screened_stocks.append({
-                "symbol": ratio.symbol,
-                "roe": ratio.roe,
-                "pe_ratio": ratio.pe_ratio,
-                "profit_margin": ratio.profit_margin,
-                "debt_to_equity": ratio.debt_to_equity,
-                "current_ratio": ratio.current_ratio,
-                "period_date": ratio.period_date.isoformat()
+                "symbol": row.symbol,
+                "roe": float(row.roe) if row.roe else None,
+                "pe_ratio": float(row.pe_ratio) if row.pe_ratio else None,
+                "profit_margin": float(row.profit_margin) if row.profit_margin else None,
+                "debt_to_equity": float(row.debt_equity) if row.debt_equity else None,
+                "current_ratio": None,  # Not available in company_fundamentals
+                "market_cap": row.market_cap,
+                "beta": float(row.beta) if row.beta else None,
+                "dividend_yield": float(row.dividend_yield) if row.dividend_yield else None,
+                "date": row.date.isoformat() if row.date else None
             })
         
         return {

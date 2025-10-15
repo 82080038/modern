@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Connection</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Test Socket.IO Connection</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+    
+    <script>
+        const socket = io('http://localhost:5001');
+        
+        socket.on('connect', function() {
+            document.getElementById('status').innerHTML = 'Connected to server!';
+            document.getElementById('status').style.color = 'green';
+        });
+        
+        socket.on('disconnect', function() {
+            document.getElementById('status').innerHTML = 'Disconnected from server';
+            document.getElementById('status').style.color = 'red';
+        });
+        
+        socket.on('connect_error', function(error) {
+            document.getElementById('status').innerHTML = 'Connection error: ' + error.message;
+            document.getElementById('status').style.color = 'red';
+        });
+        
+        socket.on('simulation_update', function(data) {
+            const messages = document.getElementById('messages');
+            messages.innerHTML += '<div>Simulation update: ' + JSON.stringify(data) + '</div>';
+        });
+        
+        // Test API endpoints
+        fetch('http://localhost:5001/api/simulation-status')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('messages').innerHTML += '<div>API Status: ' + JSON.stringify(data) + '</div>';
+            })
+            .catch(error => {
+                document.getElementById('messages').innerHTML += '<div>API Error: ' + error.message + '</div>';
+            });
+    </script>
+</body>
+</html>

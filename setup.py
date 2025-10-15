@@ -72,12 +72,12 @@ def create_env_file():
         return True
     
     env_content = """# Database Configuration
-DATABASE_URL=mysql://root:password@localhost:3306/trading_platform
+DATABASE_URL=mysql://root:password@localhost:3306/scalper
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
 MYSQL_USER=root
 MYSQL_PASSWORD=password
-MYSQL_DATABASE=trading_platform
+MYSQL_DATABASE=scalper
 
 # Redis Configuration
 REDIS_URL=redis://localhost:6379
@@ -154,10 +154,10 @@ def check_dependencies():
 def setup_database():
     """Setup database schema"""
     print("🗄️  Setting up database...")
-    print("Please ensure MySQL is running and create a database named 'trading_platform'")
+    print("Please ensure MySQL is running and create a database named 'scalper'")
     print("You can do this by running:")
     print("   mysql -u root -p")
-    print("   CREATE DATABASE trading_platform;")
+    print("   CREATE DATABASE scalper;")
     print("   exit")
     
     response = input("Have you created the database? (y/n): ")

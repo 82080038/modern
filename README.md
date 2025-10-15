@@ -111,7 +111,7 @@ pip install -r requirements.txt
 ```bash
 # Create MySQL database
 mysql -u root -p
-CREATE DATABASE trading_platform;
+CREATE DATABASE scalper;
 ```
 
 4. **Environment Configuration**

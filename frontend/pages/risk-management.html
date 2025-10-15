@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Management - Modern Trading Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .risk-metric {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        .risk-alert {
+            border-left: 4px solid #dc3545;
+            background: #f8d7da;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .risk-warning {
+            border-left: 4px solid #ffc107;
+            background: #fff3cd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .risk-safe {
+            border-left: 4px solid #28a745;
+            background: #d4edda;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .chart-container {
+            height: 400px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .risk-dashboard {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .var-chart {
+            height: 300px;
+        }
+        .stress-test-result {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../pages/index.html">
+                <i class="fas fa-chart-line me-2"></i>Modern Trading Platform
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="trading.html">Trading</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="technical.html">Technical</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="fundamental.html">Fundamental</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="backtesting.html">Backtesting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="risk-management.html">Risk</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="portfolio-optimization.html">Portfolio</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-6">
+                    <i class="fas fa-shield-alt me-2"></i>Risk Management
+                </h1>
+                <p class="text-muted">Monitor and control your trading risks</p>
+            </div>
+        </div>
+
+        <!-- Risk Alerts -->
+        <div class="row mb-4" id="riskAlerts">
+            <!-- Risk alerts will be populated here -->
+        </div>
+
+        <!-- Risk Dashboard -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="risk-dashboard">
+                    <h4><i class="fas fa-tachometer-alt me-2"></i>Risk Dashboard</h4>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="risk-metric">
+                                <div class="d-flex justify-content-between">
+                                    <span>Portfolio Value</span>
+                                    <span class="fw-bold" id="portfolioValue">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="risk-metric">
+                                <div class="d-flex justify-content-between">
+                                    <span>VaR (1 day)</span>
+                                    <span class="fw-bold" id="var1d">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="risk-metric">
+                                <div class="d-flex justify-content-between">
+                                    <span>CVaR (1 day)</span>
+                                    <span class="fw-bold" id="cvar1d">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="risk-metric">
+                                <div class="d-flex justify-content-between">
+                                    <span>Max Drawdown</span>
+                                    <span class="fw-bold" id="maxDrawdown">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Metrics Charts -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line me-2"></i>Value at Risk (VaR)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="varChart" class="var-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-pie me-2"></i>Risk Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="riskDistributionChart" class="var-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stress Testing -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt me-2"></i>Stress Testing</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Stress Test Scenario</label>
+                                    <select class="form-select" id="stressScenario">
+                                        <option value="market_crash">Market Crash (-20%)</option>
+                                        <option value="recession">Recession (-15%)</option>
+                                        <option value="volatility_spike">Volatility Spike (+50%)</option>
+                                        <option value="sector_crash">Sector Crash (-30%)</option>
+                                        <option value="custom">Custom Scenario</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3" id="customScenario" style="display: none;">
+                                    <label class="form-label">Custom Impact (%)</label>
+                                    <input type="number" class="form-control" id="customImpact" placeholder="-20">
+                                </div>
+                                <button class="btn btn-primary" onclick="runStressTest()">
+                                    <i class="fas fa-play me-2"></i>Run Stress Test
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="stressTestResults">
+                                    <!-- Stress test results will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Limits -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i>Risk Limits</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Current Limits</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Limit Type</th>
+                                                <th>Current</th>
+                                                <th>Limit</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="riskLimitsTable">
+                                            <!-- Risk limits will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Set New Limits</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Max Position Size (%)</label>
+                                    <input type="number" class="form-control" id="maxPositionSize" value="10">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Daily Loss Limit (%)</label>
+                                    <input type="number" class="form-control" id="dailyLossLimit" value="5">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Max Drawdown (%)</label>
+                                    <input type="number" class="form-control" id="maxDrawdownLimit" value="15">
+                                </div>
+                                <button class="btn btn-success" onclick="updateRiskLimits()">
+                                    <i class="fas fa-save me-2"></i>Update Limits
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Reports -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h4><i class="fas fa-file-alt me-2"></i>Risk Reports</h4>
+                <div class="row" id="riskReports">
+                    <!-- Risk reports will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk History -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h4><i class="fas fa-history me-2"></i>Risk History</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>VaR</th>
+                                <th>CVaR</th>
+                                <th>Max DD</th>
+                                <th>Risk Score</th>
+                                <th>Alerts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riskHistoryTable">
+                            <!-- Risk history will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let varChart;
+        let riskDistributionChart;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRiskDashboard();
+            loadRiskAlerts();
+            loadRiskLimits();
+            loadRiskHistory();
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // Initialize VaR Chart
+            const varCtx = document.getElementById('varChart').getContext('2d');
+            varChart = new Chart(varCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'VaR (1 day)',
+                        data: [],
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'CVaR (1 day)',
+                        data: [],
+                        borderColor: '#fd7e14',
+                        backgroundColor: 'rgba(253, 126, 20, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Risk Amount ($)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Initialize Risk Distribution Chart
+            const riskCtx = document.getElementById('riskDistributionChart').getContext('2d');
+            riskDistributionChart = new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                    datasets: [{
+                        data: [60, 30, 10],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadRiskDashboard() {
+            try {
+                const response = await fetch('/api/v1/risk/dashboard');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateRiskDashboard(data);
+                }
+            } catch (error) {
+                console.error('Error loading risk dashboard:', error);
+            }
+        }
+
+        function updateRiskDashboard(data) {
+            document.getElementById('portfolioValue').textContent = `$${data.portfolio_value.toLocaleString()}`;
+            document.getElementById('var1d').textContent = `$${data.var_1d.toLocaleString()}`;
+            document.getElementById('cvar1d').textContent = `$${data.cvar_1d.toLocaleString()}`;
+            document.getElementById('maxDrawdown').textContent = `${(data.max_drawdown * 100).toFixed(2)}%`;
+        }
+
+        async function loadRiskAlerts() {
+            try {
+                const response = await fetch('/api/v1/risk/alerts');
+                if (response.ok) {
+                    const alerts = await response.json();
+                    displayRiskAlerts(alerts);
+                }
+            } catch (error) {
+                console.error('Error loading risk alerts:', error);
+            }
+        }
+
+        function displayRiskAlerts(alerts) {
+            const alertsContainer = document.getElementById('riskAlerts');
+            
+            if (alerts.length === 0) {
+                alertsContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="risk-safe">
+                            <i class="fas fa-check-circle me-2"></i>
+                            No risk alerts at this time. Your portfolio is within safe limits.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const alertCards = alerts.map(alert => {
+                const alertClass = alert.severity === 'high' ? 'risk-alert' : 
+                                 alert.severity === 'medium' ? 'risk-warning' : 'risk-safe';
+                const icon = alert.severity === 'high' ? 'fa-exclamation-triangle' : 
+                           alert.severity === 'medium' ? 'fa-exclamation-circle' : 'fa-info-circle';
+                
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="${alertClass}">
+                            <div class="d-flex align-items-center">
+                                <i class="fas ${icon} me-2"></i>
+                                <strong>${alert.title}</strong>
+                            </div>
+                            <p class="mb-0 mt-2">${alert.message}</p>
+                            <small class="text-muted">${new Date(alert.timestamp).toLocaleString()}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            alertsContainer.innerHTML = alertCards;
+        }
+
+        async function loadRiskLimits() {
+            try {
+                const response = await fetch('/api/v1/risk/limits');
+                if (response.ok) {
+                    const limits = await response.json();
+                    displayRiskLimits(limits);
+                }
+            } catch (error) {
+                console.error('Error loading risk limits:', error);
+            }
+        }
+
+        function displayRiskLimits(limits) {
+            const tableBody = document.getElementById('riskLimitsTable');
+            
+            const limitRows = limits.map(limit => {
+                const statusClass = limit.current <= limit.limit ? 'text-success' : 'text-danger';
+                const statusIcon = limit.current <= limit.limit ? 'fa-check' : 'fa-exclamation-triangle';
+                
+                return `
+                    <tr>
+                        <td>${limit.type}</td>
+                        <td>${limit.current}${limit.unit}</td>
+                        <td>${limit.limit}${limit.unit}</td>
+                        <td>
+                            <i class="fas ${statusIcon} ${statusClass}"></i>
+                            <span class="${statusClass}">${limit.current <= limit.limit ? 'OK' : 'EXCEEDED'}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tableBody.innerHTML = limitRows;
+        }
+
+        async function loadRiskHistory() {
+            try {
+                const response = await fetch('/api/v1/risk/history');
+                if (response.ok) {
+                    const history = await response.json();
+                    displayRiskHistory(history);
+                    updateVarChart(history);
+                }
+            } catch (error) {
+                console.error('Error loading risk history:', error);
+            }
+        }
+
+        function displayRiskHistory(history) {
+            const tableBody = document.getElementById('riskHistoryTable');
+            
+            const historyRows = history.map(record => `
+                <tr>
+                    <td>${new Date(record.date).toLocaleDateString()}</td>
+                    <td>$${record.var.toLocaleString()}</td>
+                    <td>$${record.cvar.toLocaleString()}</td>
+                    <td class="text-danger">${(record.max_drawdown * 100).toFixed(2)}%</td>
+                    <td>
+                        <span class="badge bg-${record.risk_score >= 7 ? 'danger' : record.risk_score >= 4 ? 'warning' : 'success'}">
+                            ${record.risk_score}/10
+                        </span>
+                    </td>
+                    <td>${record.alerts_count}</td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = historyRows;
+        }
+
+        function updateVarChart(history) {
+            const labels = history.map(record => new Date(record.date).toLocaleDateString());
+            const varData = history.map(record => record.var);
+            const cvarData = history.map(record => record.cvar);
+
+            varChart.data.labels = labels;
+            varChart.data.datasets[0].data = varData;
+            varChart.data.datasets[1].data = cvarData;
+            varChart.update();
+        }
+
+        async function runStressTest() {
+            const scenario = document.getElementById('stressScenario').value;
+            let impact = 0;
+
+            if (scenario === 'custom') {
+                impact = parseFloat(document.getElementById('customImpact').value);
+            } else {
+                const impacts = {
+                    'market_crash': -20,
+                    'recession': -15,
+                    'volatility_spike': 50,
+                    'sector_crash': -30
+                };
+                impact = impacts[scenario];
+            }
+
+            try {
+                const response = await fetch('/api/v1/risk/stress-test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        scenario: scenario,
+                        impact: impact
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    displayStressTestResult(result);
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.detail);
+                }
+            } catch (error) {
+                console.error('Error running stress test:', error);
+                alert('Error running stress test');
+            }
+        }
+
+        function displayStressTestResult(result) {
+            const resultsContainer = document.getElementById('stressTestResults');
+            
+            const resultCard = `
+                <div class="stress-test-result">
+                    <h6>Stress Test Results</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Portfolio Impact</small>
+                            <div class="h5 ${result.portfolio_impact >= 0 ? 'text-success' : 'text-danger'}">
+                                ${(result.portfolio_impact * 100).toFixed(2)}%
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">VaR Impact</small>
+                            <div class="h5 text-danger">
+                                $${result.var_impact.toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Expected Loss</small>
+                            <div class="h5 text-danger">
+                                $${result.expected_loss.toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Risk Level</small>
+                            <div class="h5">
+                                <span class="badge bg-${result.risk_level >= 7 ? 'danger' : result.risk_level >= 4 ? 'warning' : 'success'}">
+                                    ${result.risk_level}/10
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = resultCard;
+        }
+
+        async function updateRiskLimits() {
+            const limits = {
+                max_position_size: parseFloat(document.getElementById('maxPositionSize').value),
+                daily_loss_limit: parseFloat(document.getElementById('dailyLossLimit').value),
+                max_drawdown: parseFloat(document.getElementById('maxDrawdownLimit').value)
+            };
+
+            try {
+                const response = await fetch('/api/v1/risk/limits', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(limits)
+                });
+
+                if (response.ok) {
+                    alert('Risk limits updated successfully');
+                    loadRiskLimits();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.detail);
+                }
+            } catch (error) {
+                console.error('Error updating risk limits:', error);
+                alert('Error updating risk limits');
+            }
+        }
+
+        // Handle custom scenario toggle
+        document.getElementById('stressScenario').addEventListener('change', function() {
+            const customDiv = document.getElementById('customScenario');
+            if (this.value === 'custom') {
+                customDiv.style.display = 'block';
+            } else {
+                customDiv.style.display = 'none';
+            }
+        });
+
+        // Auto-refresh risk data every 30 seconds
+        setInterval(function() {
+            loadRiskDashboard();
+            loadRiskAlerts();
+        }, 30000);
+    </script>
+</body>
+</html>

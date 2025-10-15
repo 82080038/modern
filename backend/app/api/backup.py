@@ -55,7 +55,7 @@ def get_backup_util():
             port=int(os.getenv("DB_PORT", "3306")),
             username=os.getenv("DB_USERNAME", "root"),
             password=os.getenv("DB_PASSWORD", ""),
-            database=os.getenv("DB_NAME", "trading_platform"),
+            database=os.getenv("DB_NAME", "scalper"),
             backup_dir=os.getenv("BACKUP_DIR", "backups")
         )
     return backup_util

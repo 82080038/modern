@@ -1,0 +1,27 @@
+# Model Evaluation System Requirements
+# Dependencies untuk sistem evaluasi model
+
+# Core dependencies
+flask==2.3.3
+flask-socketio==5.3.6
+pandas==2.1.1
+numpy==1.24.3
+sqlite3
+
+# Data visualization
+matplotlib==3.7.2
+seaborn==0.12.2
+
+# Async support
+asyncio
+
+# Web interface
+jinja2==3.1.2
+werkzeug==2.3.7
+
+# Database
+sqlalchemy==2.0.21
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
