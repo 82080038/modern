@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Analysis - Trading Platform Modern</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        .chart-container { 
+            height: 400px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            margin-bottom: 20px;
+        }
+        .indicator-panel {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .indicator-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .indicator-item:hover {
+            background: #e9ecef;
+        }
+        .indicator-item.active {
+            background: #007bff;
+            color: white;
+        }
+        .timeframe-btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .pattern-detected {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 3px;
+            padding: 5px;
+            margin: 2px;
+            font-size: 0.9em;
+        }
+        .drawing-tools {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .multi-chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .multi-chart-grid-4 {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+        .multi-chart-grid-6 {
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                🚀 Trading Platform Modern
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="fundamental.html">Fundamental</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sentiment.html">Sentiment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="trading.html">Trading</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="technical.html">Technical</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Chart Controls -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Technical Analysis Charts</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="symbol-select">Symbol:</label>
+                                    <select class="form-select" id="symbol-select" onchange="loadChart()">
+                                        <option value="BBCA">BBCA</option>
+                                        <option value="BBRI">BBRI</option>
+                                        <option value="BMRI">BMRI</option>
+                                        <option value="TLKM">TLKM</option>
+                                        <option value="ASII">ASII</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="timeframe-select">Timeframe:</label>
+                                    <select class="form-select" id="timeframe-select" onchange="loadChart()">
+                                        <option value="1m">1 Minute</option>
+                                        <option value="5m">5 Minutes</option>
+                                        <option value="15m">15 Minutes</option>
+                                        <option value="1h">1 Hour</option>
+                                        <option value="4h">4 Hours</option>
+                                        <option value="1D" selected>1 Day</option>
+                                        <option value="1W">1 Week</option>
+                                        <option value="1M">1 Month</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="layout-select">Layout:</label>
+                                    <select class="form-select" id="layout-select" onchange="changeLayout()">
+                                        <option value="single">Single Chart</option>
+                                        <option value="2">2 Charts</option>
+                                        <option value="4">4 Charts</option>
+                                        <option value="6">6 Charts</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <div class="d-grid">
+                                        <button class="btn btn-primary" onclick="loadChart()">Load Chart</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chart -->
+        <div class="row mb-4">
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📈 Price Chart</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="main-chart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <!-- Indicators Panel -->
+                <div class="indicator-panel">
+                    <h6>Technical Indicators</h6>
+                    <div id="indicators-list">
+                        <div class="indicator-item" onclick="addIndicator('SMA')">
+                            <strong>SMA</strong> - Simple Moving Average
+                        </div>
+                        <div class="indicator-item" onclick="addIndicator('EMA')">
+                            <strong>EMA</strong> - Exponential Moving Average
+                        </div>
+                        <div class="indicator-item" onclick="addIndicator('RSI')">
+                            <strong>RSI</strong> - Relative Strength Index
+                        </div>
+                        <div class="indicator-item" onclick="addIndicator('MACD')">
+                            <strong>MACD</strong> - Moving Average Convergence Divergence
+                        </div>
+                        <div class="indicator-item" onclick="addIndicator('Bollinger Bands')">
+                            <strong>Bollinger Bands</strong> - Volatility Bands
+                        </div>
+                        <div class="indicator-item" onclick="addIndicator('Volume Profile')">
+                            <strong>Volume Profile</strong> - Volume Distribution
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawing Tools -->
+                <div class="drawing-tools">
+                    <h6>Drawing Tools</h6>
+                    <button class="btn btn-sm btn-outline-primary" onclick="addDrawingTool('trendline')">Trendline</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="addDrawingTool('horizontal')">Horizontal Line</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="addDrawingTool('fibonacci')">Fibonacci</button>
+                </div>
+
+                <!-- Pattern Recognition -->
+                <div class="indicator-panel">
+                    <h6>Pattern Recognition</h6>
+                    <button class="btn btn-sm btn-success" onclick="detectPatterns()">Detect Patterns</button>
+                    <div id="patterns-list" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multi-Chart Layout -->
+        <div class="row mb-4" id="multi-chart-section" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Multi-Chart Layout</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="chart-layout-2" class="multi-chart-grid" style="display: none;"></div>
+                        <div id="chart-layout-4" class="multi-chart-grid multi-chart-grid-4" style="display: none;"></div>
+                        <div id="chart-layout-6" class="multi-chart-grid multi-chart-grid-6" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Analysis Summary -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Technical Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="technical-summary">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading technical analysis...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🎯 Trading Signals</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="trading-signals">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading trading signals...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="/js/charts.js"></script>
+    
+    <script>
+        let currentSymbol = 'BBCA';
+        let currentTimeframe = '1D';
+        let currentLayout = 'single';
+        let activeIndicators = [];
+        let detectedPatterns = [];
+
+        // Initialize page
+        $(document).ready(function() {
+            loadChart();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Chart resize on window resize
+            window.addEventListener('resize', () => {
+                if (window.tradingCharts) {
+                    window.tradingCharts.resizeChart('main');
+                }
+            });
+        }
+
+        async function loadChart() {
+            currentSymbol = $('#symbol-select').val();
+            currentTimeframe = $('#timeframe-select').val();
+            
+            try {
+                if (window.tradingCharts) {
+                    const data = await window.tradingCharts.loadChartData(currentSymbol, currentTimeframe, 100);
+                    if (data) {
+                        updateTechnicalSummary();
+                        updateTradingSignals();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading chart:', error);
+                alert('Error loading chart data');
+            }
+        }
+
+        function addIndicator(indicatorType) {
+            if (!window.tradingCharts) return;
+            
+            const params = getIndicatorParams(indicatorType);
+            const indicatorId = window.tradingCharts.addIndicator('main', indicatorType, params);
+            
+            if (indicatorId) {
+                activeIndicators.push({
+                    id: indicatorId,
+                    type: indicatorType,
+                    params: params
+                });
+                
+                // Update UI
+                updateIndicatorsList();
+                updateTechnicalSummary();
+            }
+        }
+
+        function getIndicatorParams(indicatorType) {
+            const defaultParams = {
+                'SMA': { period: 20, color: '#ff6b6b' },
+                'EMA': { period: 20, color: '#4ecdc4' },
+                'RSI': { period: 14, color: '#ff9f43' },
+                'MACD': { fastPeriod: 12, slowPeriod: 26, signalPeriod: 9 },
+                'Bollinger Bands': { period: 20, stdDev: 2 },
+                'Volume Profile': { bins: 20 }
+            };
+            
+            return defaultParams[indicatorType] || {};
+        }
+
+        function removeIndicator(indicatorId) {
+            if (!window.tradingCharts) return;
+            
+            window.tradingCharts.removeIndicator('main', indicatorId);
+            activeIndicators = activeIndicators.filter(ind => ind.id !== indicatorId);
+            
+            updateIndicatorsList();
+            updateTechnicalSummary();
+        }
+
+        function updateIndicatorsList() {
+            const indicatorsList = $('#indicators-list');
+            indicatorsList.empty();
+            
+            // Add active indicators
+            activeIndicators.forEach(indicator => {
+                const indicatorItem = $(`
+                    <div class="indicator-item active">
+                        <strong>${indicator.type}</strong>
+                        <button class="btn btn-sm btn-danger float-end" onclick="removeIndicator('${indicator.id}')">×</button>
+                    </div>
+                `);
+                indicatorsList.append(indicatorItem);
+            });
+            
+            // Add available indicators
+            const availableIndicators = [
+                { name: 'SMA', desc: 'Simple Moving Average' },
+                { name: 'EMA', desc: 'Exponential Moving Average' },
+                { name: 'RSI', desc: 'Relative Strength Index' },
+                { name: 'MACD', desc: 'Moving Average Convergence Divergence' },
+                { name: 'Bollinger Bands', desc: 'Volatility Bands' },
+                { name: 'Volume Profile', desc: 'Volume Distribution' }
+            ];
+            
+            availableIndicators.forEach(indicator => {
+                if (!activeIndicators.find(active => active.type === indicator.name)) {
+                    const indicatorItem = $(`
+                        <div class="indicator-item" onclick="addIndicator('${indicator.name}')">
+                            <strong>${indicator.name}</strong> - ${indicator.desc}
+                        </div>
+                    `);
+                    indicatorsList.append(indicatorItem);
+                }
+            });
+        }
+
+        function addDrawingTool(toolType) {
+            if (!window.tradingCharts) return;
+            
+            // Simple implementation - in real app, would have interactive drawing
+            const params = getDrawingToolParams(toolType);
+            window.tradingCharts.addDrawingTool('main', toolType, params);
+        }
+
+        function getDrawingToolParams(toolType) {
+            const now = Date.now() / 1000;
+            const oneDayAgo = now - (24 * 60 * 60);
+            
+            switch (toolType) {
+                case 'trendline':
+                    return {
+                        startTime: oneDayAgo,
+                        endTime: now,
+                        startPrice: 1000,
+                        endPrice: 1100
+                    };
+                case 'horizontal':
+                    return { price: 1050 };
+                case 'fibonacci':
+                    return {
+                        startTime: oneDayAgo,
+                        endTime: now,
+                        startPrice: 1000,
+                        endPrice: 1100
+                    };
+                default:
+                    return {};
+            }
+        }
+
+        function detectPatterns() {
+            if (!window.tradingCharts) return;
+            
+            const chartInfo = window.tradingCharts.getChartInfo('main');
+            if (chartInfo && chartInfo.data) {
+                detectedPatterns = window.tradingCharts.detectPatterns(chartInfo.data);
+                updatePatternsList();
+            }
+        }
+
+        function updatePatternsList() {
+            const patternsList = $('#patterns-list');
+            patternsList.empty();
+            
+            if (detectedPatterns.length === 0) {
+                patternsList.html('<p class="text-muted">No patterns detected</p>');
+                return;
+            }
+            
+            detectedPatterns.forEach(pattern => {
+                const patternItem = $(`
+                    <div class="pattern-detected">
+                        <strong>${pattern.type}</strong> - ${new Date(pattern.timestamp).toLocaleString()}
+                        <br><small>Confidence: ${(pattern.confidence * 100).toFixed(0)}%</small>
+                    </div>
+                `);
+                patternsList.append(patternItem);
+            });
+        }
+
+        function changeLayout() {
+            currentLayout = $('#layout-select').val();
+            const multiChartSection = $('#multi-chart-section');
+            
+            if (currentLayout === 'single') {
+                multiChartSection.hide();
+            } else {
+                multiChartSection.show();
+                
+                // Hide all layouts
+                $('[id^="chart-layout-"]').hide();
+                
+                // Show selected layout
+                $(`#chart-layout-${currentLayout}`).show();
+            }
+        }
+
+        function updateTechnicalSummary() {
+            const summary = $('#technical-summary');
+            
+            // Simple technical analysis
+            const analysis = {
+                trend: 'Bullish',
+                support: '1020',
+                resistance: '1080',
+                rsi: '65.4',
+                macd: 'Bullish',
+                volume: 'Above Average'
+            };
+            
+            const html = `
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Trend:</strong> <span class="text-success">${analysis.trend}</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>RSI:</strong> ${analysis.rsi}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <strong>Support:</strong> ${analysis.support}
+                    </div>
+                    <div class="col-6">
+                        <strong>Resistance:</strong> ${analysis.resistance}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <strong>MACD:</strong> <span class="text-success">${analysis.macd}</span>
+                    </div>
+                    <div class="col-6">
+                        <strong>Volume:</strong> ${analysis.volume}
+                    </div>
+                </div>
+            `;
+            
+            summary.html(html);
+        }
+
+        function updateTradingSignals() {
+            const signals = $('#trading-signals');
+            
+            const tradingSignals = [
+                { signal: 'BUY', strength: 'Strong', reason: 'RSI Oversold + MACD Bullish' },
+                { signal: 'HOLD', strength: 'Medium', reason: 'Price near resistance' },
+                { signal: 'SELL', strength: 'Weak', reason: 'Volume declining' }
+            ];
+            
+            let html = '';
+            tradingSignals.forEach(signal => {
+                const signalClass = signal.signal === 'BUY' ? 'text-success' : 
+                                  signal.signal === 'SELL' ? 'text-danger' : 'text-warning';
+                
+                html += `
+                    <div class="border-bottom pb-2 mb-2">
+                        <strong class="${signalClass}">${signal.signal}</strong> - ${signal.strength}
+                        <br><small>${signal.reason}</small>
+                    </div>
+                `;
+            });
+            
+            signals.html(html);
+        }
+
+        // Initialize indicators list
+        updateIndicatorsList();
+    </script>
+</body>
+</html>

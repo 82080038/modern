@@ -7,9 +7,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 import uvicorn
 import os
-from app.api import fundamental, sentiment
+from app.api import fundamental, sentiment, market_data, trading, notifications, security, tax, backup, cache, backtesting, watchlist, pattern, dashboard, earnings, sentiment_scraping, economic_calendar, web_scraping
 from app.database import engine, Base
 from app.config import settings
+from app.websocket.websocket_server import sio, start_websocket_server, stop_websocket_server
 import logging
 
 # Configure logging
@@ -42,12 +43,43 @@ async def startup_event():
         # Create all tables
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created successfully")
+        
+        # Start WebSocket server
+        await start_websocket_server(app)
+        logger.info("WebSocket server started")
     except Exception as e:
         logger.error(f"Error creating database tables: {e}")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Shutdown event"""
+    try:
+        await stop_websocket_server()
+        logger.info("WebSocket server stopped")
+    except Exception as e:
+        logger.error(f"Error stopping WebSocket server: {e}")
 
 # Include API routers
 app.include_router(fundamental.router, prefix="/api/v1")
 app.include_router(sentiment.router, prefix="/api/v1")
+app.include_router(market_data.router, prefix="/api/v1")
+app.include_router(trading.router, prefix="/api/v1")
+app.include_router(notifications.router, prefix="/api/v1")
+app.include_router(security.router, prefix="/api/v1")
+app.include_router(tax.router, prefix="/api/v1")
+app.include_router(backup.router, prefix="/api/v1")
+app.include_router(cache.router, prefix="/api/v1")
+app.include_router(backtesting.router, prefix="/api/v1")
+app.include_router(watchlist.router, prefix="/api/v1")
+app.include_router(pattern.router, prefix="/api/v1")
+app.include_router(dashboard.router, prefix="/api/v1")
+app.include_router(earnings.router, prefix="/api/v1")
+app.include_router(sentiment_scraping.router, prefix="/api/v1")
+app.include_router(economic_calendar.router, prefix="/api/v1")
+app.include_router(web_scraping.router, prefix="/api/v1")
+
+# Mount SocketIO app
+app.mount("/socket.io", sio)
 
 # Health check endpoint
 @app.get("/health")
@@ -59,7 +91,11 @@ async def health_check():
         "version": "1.0.0",
         "features": [
             "Fundamental Analysis",
-            "Sentiment Analysis", 
+            "Sentiment Analysis",
+            "Real-Time Market Data",
+            "WebSocket Streaming",
+            "Order Management System",
+            "Training & Real-Time Trading Modes",
             "Technical Analysis (coming soon)",
             "AI/ML Models (coming soon)",
             "Backtesting (coming soon)"

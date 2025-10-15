@@ -91,3 +91,12 @@ httpx==0.25.2
 requests==2.31.0
 loguru==0.7.2
 pytz==2023.3
+
+# Rate Limiting & WebSocket
+slowapi==0.1.9
+python-socketio==5.10.0
+socketio==5.10.0
+
+# Additional Financial Data
+yfinance==0.2.32
+pytrends==4.9.2

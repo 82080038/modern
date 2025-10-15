@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Market Data - Trading Platform Modern</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.css" rel="stylesheet">
+    <style>
+        .price-ticker { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .price-up { color: #28a745; font-weight: bold; }
+        .price-down { color: #dc3545; font-weight: bold; }
+        .price-neutral { color: #6c757d; }
+        .chart-container { height: 400px; margin-bottom: 20px; }
+        .watchlist-item { 
+            border: 1px solid #dee2e6; 
+            border-radius: 5px; 
+            padding: 10px; 
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .watchlist-item:hover { 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            transform: translateY(-2px);
+        }
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .timeframe-btn { margin: 2px; }
+        .symbol-search { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                🚀 Trading Platform Modern
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="fundamental.html">Fundamental</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#realtime">Real-Time</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sentiment.html">Sentiment</a>
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    Real-Time Market Data
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Connection Status -->
+    <div class="connection-status">
+        <span id="connection-status" class="badge bg-danger">Disconnected</span>
+    </div>
+
+    <div class="container-fluid mt-4">
+        <!-- Symbol Search & Controls -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Real-Time Market Data</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="symbol-input" placeholder="Enter symbol (e.g., BBCA, BBRI, BMRI)" value="BBCA">
+                                    <button class="btn btn-primary" onclick="subscribeSymbol()">Subscribe</button>
+                                    <button class="btn btn-outline-secondary" onclick="unsubscribeSymbol()">Unsubscribe</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-outline-primary timeframe-btn" onclick="changeTimeframe('1m')">1m</button>
+                                    <button class="btn btn-outline-primary timeframe-btn" onclick="changeTimeframe('5m')">5m</button>
+                                    <button class="btn btn-outline-primary timeframe-btn" onclick="changeTimeframe('15m')">15m</button>
+                                    <button class="btn btn-outline-primary timeframe-btn" onclick="changeTimeframe('1h')">1h</button>
+                                    <button class="btn btn-outline-primary timeframe-btn active" onclick="changeTimeframe('1D')">1D</button>
+                                    <button class="btn btn-outline-primary timeframe-btn" onclick="changeTimeframe('1W')">1W</button>
+                                    <button class="btn btn-outline-primary timeframe-btn" onclick="changeTimeframe('1M')">1M</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Ticker -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="price-ticker">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6>Current Symbol</h6>
+                            <h4 id="current-symbol">BBCA</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Last Price</h6>
+                            <h4 id="last-price" class="price-neutral">Loading...</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Change</h6>
+                            <h4 id="price-change" class="price-neutral">Loading...</h4>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Volume</h6>
+                            <h4 id="volume">Loading...</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📈 Price Chart</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="price-chart" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Watchlist -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📋 Watchlist</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="watchlist-container">
+                            <!-- Watchlist items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Market Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="market-overview">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h6>Market Status</h6>
+                                    <span id="market-status" class="badge bg-success">Open</span>
+                                </div>
+                                <div class="col-6">
+                                    <h6>Last Update</h6>
+                                    <span id="last-update">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <script>
+        // Global variables
+        let socket;
+        let currentSymbol = 'BBCA';
+        let currentTimeframe = '1D';
+        let priceChart;
+        let subscribedSymbols = new Set();
+        let watchlistData = {};
+
+        // Initialize page
+        $(document).ready(function() {
+            initializeWebSocket();
+            initializeChart();
+            loadWatchlist();
+            updateLastUpdateTime();
+            
+            // Update time every second
+            setInterval(updateLastUpdateTime, 1000);
+        });
+
+        function initializeWebSocket() {
+            // Connect to WebSocket server
+            socket = io('http://localhost:8000');
+            
+            socket.on('connect', function() {
+                console.log('Connected to WebSocket server');
+                $('#connection-status').removeClass('bg-danger').addClass('bg-success').text('Connected');
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('Disconnected from WebSocket server');
+                $('#connection-status').removeClass('bg-success').addClass('bg-danger').text('Disconnected');
+            });
+            
+            socket.on('price_update', function(data) {
+                console.log('Price update received:', data);
+                updatePriceDisplay(data);
+                updateWatchlistItem(data.symbol, data);
+            });
+            
+            socket.on('historical_data', function(data) {
+                console.log('Historical data received:', data);
+                updateChart(data);
+            });
+            
+            socket.on('error', function(error) {
+                console.error('WebSocket error:', error);
+                alert('Error: ' + error.message);
+            });
+        }
+
+        function initializeChart() {
+            const options = {
+                series: [{
+                    name: 'Price',
+                    data: []
+                }],
+                chart: {
+                    type: 'candlestick',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: true,
+                            zoom: true,
+                            zoomin: true,
+                            zoomout: true,
+                            pan: true,
+                            reset: true
+                        }
+                    }
+                },
+                xaxis: {
+                    type: 'datetime'
+                },
+                yaxis: {
+                    tooltip: {
+                        enabled: true
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    custom: function({seriesIndex, dataPointIndex, w}) {
+                        const data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+                        return `
+                            <div class="p-2">
+                                <div><strong>Date:</strong> ${new Date(data.x).toLocaleString()}</div>
+                                <div><strong>Open:</strong> ${data.y[0]}</div>
+                                <div><strong>High:</strong> ${data.y[1]}</div>
+                                <div><strong>Low:</strong> ${data.y[2]}</div>
+                                <div><strong>Close:</strong> ${data.y[3]}</div>
+                            </div>
+                        `;
+                    }
+                }
+            };
+            
+            priceChart = new ApexCharts(document.querySelector("#price-chart"), options);
+            priceChart.render();
+        }
+
+        function subscribeSymbol() {
+            const symbol = $('#symbol-input').val().toUpperCase();
+            if (!symbol) {
+                alert('Please enter a symbol');
+                return;
+            }
+            
+            currentSymbol = symbol;
+            subscribedSymbols.add(symbol);
+            
+            // Subscribe to symbol updates
+            socket.emit('subscribe_symbol', { symbol: symbol });
+            
+            // Get historical data
+            socket.emit('get_historical_data', { 
+                symbol: symbol, 
+                timeframe: currentTimeframe,
+                limit: 100 
+            });
+            
+            // Get real-time price
+            socket.emit('get_real_time_price', { symbol: symbol });
+            
+            updateCurrentSymbol();
+        }
+
+        function unsubscribeSymbol() {
+            const symbol = $('#symbol-input').val().toUpperCase();
+            if (symbol) {
+                socket.emit('unsubscribe_symbol', { symbol: symbol });
+                subscribedSymbols.delete(symbol);
+            }
+        }
+
+        function changeTimeframe(timeframe) {
+            currentTimeframe = timeframe;
+            
+            // Update active button
+            $('.timeframe-btn').removeClass('active');
+            $(`button[onclick="changeTimeframe('${timeframe}')"]`).addClass('active');
+            
+            // Get new data
+            if (currentSymbol) {
+                socket.emit('get_historical_data', { 
+                    symbol: currentSymbol, 
+                    timeframe: timeframe,
+                    limit: 100 
+                });
+            }
+        }
+
+        function updatePriceDisplay(data) {
+            if (data.symbol === currentSymbol) {
+                $('#last-price').text(data.price ? 'Rp ' + data.price.toLocaleString() : 'N/A');
+                
+                if (data.change && data.change_percent) {
+                    const changeText = `${data.change > 0 ? '+' : ''}${data.change.toFixed(2)} (${data.change_percent.toFixed(2)}%)`;
+                    $('#price-change').text(changeText);
+                    
+                    // Color coding
+                    $('#price-change').removeClass('price-up price-down price-neutral');
+                    if (data.change > 0) {
+                        $('#price-change').addClass('price-up');
+                    } else if (data.change < 0) {
+                        $('#price-change').addClass('price-down');
+                    } else {
+                        $('#price-change').addClass('price-neutral');
+                    }
+                }
+                
+                if (data.volume) {
+                    $('#volume').text(data.volume.toLocaleString());
+                }
+            }
+        }
+
+        function updateChart(data) {
+            if (data.symbol === currentSymbol && data.data) {
+                const chartData = data.data.map(item => ({
+                    x: new Date(item.timestamp).getTime(),
+                    y: [item.open, item.high, item.low, item.close]
+                })).reverse(); // Reverse to show oldest first
+                
+                priceChart.updateSeries([{
+                    name: 'Price',
+                    data: chartData
+                }]);
+            }
+        }
+
+        function updateCurrentSymbol() {
+            $('#current-symbol').text(currentSymbol);
+        }
+
+        function loadWatchlist() {
+            // Default watchlist
+            const defaultSymbols = ['BBCA', 'BBRI', 'BMRI', 'TLKM', 'UNVR', 'ASII'];
+            
+            defaultSymbols.forEach(symbol => {
+                addToWatchlist(symbol);
+            });
+        }
+
+        function addToWatchlist(symbol) {
+            if (watchlistData[symbol]) return;
+            
+            watchlistData[symbol] = {
+                symbol: symbol,
+                price: 0,
+                change: 0,
+                changePercent: 0,
+                volume: 0
+            };
+            
+            updateWatchlistDisplay();
+        }
+
+        function updateWatchlistItem(symbol, data) {
+            if (watchlistData[symbol]) {
+                watchlistData[symbol] = {
+                    ...watchlistData[symbol],
+                    price: data.price || 0,
+                    change: data.change || 0,
+                    changePercent: data.change_percent || 0,
+                    volume: data.volume || 0
+                };
+                
+                updateWatchlistDisplay();
+            }
+        }
+
+        function updateWatchlistDisplay() {
+            const container = $('#watchlist-container');
+            container.empty();
+            
+            Object.values(watchlistData).forEach(item => {
+                const changeClass = item.change > 0 ? 'price-up' : item.change < 0 ? 'price-down' : 'price-neutral';
+                const changeText = item.change > 0 ? '+' : '';
+                
+                const itemHtml = `
+                    <div class="watchlist-item">
+                        <div class="row">
+                            <div class="col-4">
+                                <strong>${item.symbol}</strong>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-end">
+                                    <div>Rp ${item.price.toLocaleString()}</div>
+                                    <div class="${changeClass}">${changeText}${item.change.toFixed(2)} (${item.changePercent.toFixed(2)}%)</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-end">
+                                    <small>Vol: ${item.volume.toLocaleString()}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.append(itemHtml);
+            });
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            $('#last-update').text(now.toLocaleTimeString());
+        }
+
+        // Auto-subscribe to current symbol on page load
+        $(document).ready(function() {
+            setTimeout(() => {
+                subscribeSymbol();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
