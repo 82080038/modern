@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
 import uvicorn
-from app.api import fundamental, sentiment, market_data, trading, notifications, security, tax, backup, cache, backtesting, watchlist, pattern, dashboard, earnings, sentiment_scraping, economic_calendar, web_scraping, educational, two_factor, performance_analytics, portfolio_heatmap, strategy_builder, algorithmic_trading, technical, ai_ml, risk_management, portfolio_optimization
+from app.api import fundamental, sentiment, market_data, trading, notifications, security, tax, backup, cache, backtesting, watchlist, pattern, dashboard, earnings, sentiment_scraping, economic_calendar, web_scraping, educational, two_factor, performance_analytics, portfolio_heatmap, strategy_builder, algorithmic_trading, technical, ai_ml, risk_management, portfolio_optimization, kulamagi_strategy
 from app.database import engine, Base
 from app.config import settings
 from app.websocket.websocket_server import sio, start_websocket_server, stop_websocket_server
@@ -91,6 +91,7 @@ app.include_router(technical.router, prefix="/api/v1")
 app.include_router(ai_ml.router, prefix="/api/v1")
 app.include_router(risk_management.router, prefix="/api/v1")
 app.include_router(portfolio_optimization.router, prefix="/api/v1")
+app.include_router(kulamagi_strategy.router, prefix="/api")
 
 # Mount SocketIO app
 app.mount("/socket.io", sio)
