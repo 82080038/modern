@@ -35,7 +35,7 @@ class ModelPerformance:
 class ModelEvaluator:
     """Kelas utama untuk evaluasi model"""
     
-    def __init__(self, db_path: str = "model_evaluation/models.db"):
+    def __init__(self, db_path: str = "models.db"):
         self.db_path = db_path
         self.models = {}
         self.performance_history = []

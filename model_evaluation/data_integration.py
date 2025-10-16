@@ -30,7 +30,7 @@ class DataFlow:
 class DataIntegrator:
     """Kelas utama untuk integrasi data antar modul"""
     
-    def __init__(self, db_path: str = "model_evaluation/data_integration.db"):
+    def __init__(self, db_path: str = "data_integration.db"):
         self.db_path = db_path
         self.active_flows = {}
         self.flow_history = []
